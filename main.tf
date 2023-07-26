@@ -4,6 +4,67 @@ resource "aws_vpc" "main" {
     var.tags, { Name = "${var.env}-vpc" }
   )
   }
+# public subnets
+resource "aws_subnet" "public_subnets" {
+  for_each = var.public_subnets
+  vpc_id     = aws_vpc.main.id
+  cidr_block = each.value["cidr_block"]
+  availability_zone = each.value["availability_zone"]
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-${each.value["name"]}" }
+  )
+}
+# public route table
+resource "aws_route_table" "public-route-table" {
+  vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-${each.value["name"]}" }
+  )
+  for_each = var.public_subnets
+}
+#associate route table
+resource "aws_route_table_association" "public-association" {
+  for_each = var.public_subnets
+  subnet_id      =lookup(lookup(aws_subnet.public_subnets,each.value["name"],null),"id",null)
+  route_table_id = aws_route_table.public-route-table[each.value["name"]].id
+}
+
+# private subnets
+
+resource "aws_subnet" "private_subnets" {
+  for_each = var.private_subnets
+  vpc_id     = aws_vpc.main.id
+  cidr_block = each.value["cidr_block"]
+  availability_zone = each.value["availability_zone"]
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-${each.value["name"]}" }
+  )
+}
+# private route table
+resource "aws_route_table" "private-route-table" {
+  vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-${each.value["name"]}" }
+  )
+  for_each = var.private_subnets
+}
+#associate route table
+resource "aws_route_table_association" "private-association" {
+  for_each = var.private_subnets
+  subnet_id      =lookup(lookup(aws_subnet.private_subnets,each.value["name"],null),"id",null)
+  route_table_id = aws_route_table.private-route-table[each.value["name"]].id
+}
+
+
+
+
+
+
+
 
 
 
