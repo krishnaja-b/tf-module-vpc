@@ -1,5 +1,5 @@
 resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr
+  cidr_block = "var.vpc_cidr"
   tags = merge(
     var.tags, { Name = "${var.env}-vpc" }
   )
@@ -58,6 +58,7 @@ resource "aws_route_table_association" "private-association" {
   subnet_id      =lookup(lookup(aws_subnet.private_subnets,each.value["name"],null),"id",null)
   route_table_id = aws_route_table.private-route-table[each.value["name"]].id
 }
+
 
 
 
