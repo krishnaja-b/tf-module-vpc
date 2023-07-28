@@ -1,9 +1,11 @@
 resource "aws_vpc" "main" {
-  cidr_block = "var.vpc_cidr"
+   cidr_block = var.vpc_cidr
   tags = merge(
-    var.tags, { Name = "${var.env}-vpc" }
+    var.tags,
+    { Name = "${var.env}-vpc" }
   )
-  }
+}
+
 # public subnets
 resource "aws_subnet" "public_subnets" {
   for_each = var.public_subnets
