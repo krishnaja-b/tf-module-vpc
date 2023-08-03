@@ -26,6 +26,17 @@ resource "aws_route_table" "public-route-table" {
   )
   for_each = var.public_subnets
 }
+
+# internet gateway
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-${each.value["name"]}" }
+  )
+  for_each = var.public_subnets
+}
 #associate route table
 resource "aws_route_table_association" "public-association" {
   for_each = var.public_subnets
