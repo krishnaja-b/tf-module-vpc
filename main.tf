@@ -26,6 +26,12 @@ resource "aws_route_table" "public-route-table" {
   )
   for_each = var.public_subnets
 }
+# attach igw to public route table
+
+route {
+  cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.igw.id
+}
 
 # internet gateway
 
@@ -37,6 +43,8 @@ resource "aws_internet_gateway" "igw" {
   )
   for_each = var.public_subnets
 }
+
+
 #associate route table
 resource "aws_route_table_association" "public-association" {
   for_each = var.public_subnets
